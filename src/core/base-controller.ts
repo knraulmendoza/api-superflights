@@ -1,20 +1,23 @@
 import { Body, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { IGeneryRepository } from './genery-repository.abstract';
-
-export class BaseController<T> {
-  constructor(private readonly baseService: IGeneryRepository<T>) {}
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+@ApiTags()
+export class BaseController<T, I> {
+  constructor(private readonly baseService: IGeneryRepository<T, I>) {}
   @Post()
-  async create(@Body() entity: T): Promise<T> {
+  @ApiOperation({ summary: 'Create data' })
+  @ApiResponse({ status: 200, description: 'Ok' })
+  async create(@Body() entity: T): Promise<I> {
     return this.baseService.create(entity);
   }
 
   @Get()
-  async findAll(): Promise<T[]> {
+  async findAll(): Promise<I[]> {
     return this.baseService.getAll();
   }
 
   @Get(':id')
-  async findById(@Param('id') id: string | number): Promise<T> {
+  async findById(@Param('id') id: string | number): Promise<I> {
     return this.baseService.getById(id);
   }
 
@@ -22,12 +25,12 @@ export class BaseController<T> {
   async update(
     @Param('id') id: string | number,
     @Body() entity: T,
-  ): Promise<T> {
+  ): Promise<I> {
     return this.baseService.update(id, entity);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string | number): Promise<T> {
+  async delete(@Param('id') id: string | number): Promise<I> {
     return this.baseService.delete(id);
   }
 }

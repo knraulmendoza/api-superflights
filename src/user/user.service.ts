@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IUser } from 'src/common/interfaces/user.interface';
 import { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
@@ -9,6 +9,12 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
   constructor(@InjectModel(USER.name) private readonly model: Model<IUser>) {}
+  async checkPassword(password: string, passwordDb: string): Promise<boolean> {
+    return await bcrypt.compare(password, passwordDb);
+  }
+  async findByUserName(username: string): Promise<IUser> {
+    return await this.model.findOne({ username });
+  }
   async hasPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt();
     return await bcrypt.hash(password, salt);
